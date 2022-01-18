@@ -48,6 +48,11 @@ function namabulan($nomor)
 $auth = new AuthController();
 $admin = new AdminController();
 $auth->AuthCheck('location:../login', null);
+if (isset($_POST['cari'])) {
+    $cari = $_POST['cari'];
+} else {
+    $cari = null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -75,12 +80,25 @@ $auth->AuthCheck('location:../login', null);
                     <hr>
                     <div class="row mb-3">
                         <div class="col-9">
-                            <input id="cari" name="cari" class="form-control form-control-sm" type="text" placeholder="Cari Peminjaman">
+                            <form action="" method="post">
+                                <input id="cari" name="cari" class="form-control form-control-sm" type="text" value="<?= $cari ?>" placeholder="Cari Peminjaman">
+                            </form>
                         </div>
                         <div class="col-3">
                             <a class="btn btn-primary btn-sm btn-block" href="tambah-peminjaman"><i class="fas fa-plus"></i> Tambah Peminjaman</a>
                         </div>
                     </div>
+                    <?php
+                    if (isset($cari)) {
+                    ?>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <a class="btn btn-warning btn-block" href="peminjaman">Segarkan</a>
+                            </div>
+                        </div>
+                    <?php
+                    }
+                    ?>
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -90,8 +108,8 @@ $auth->AuthCheck('location:../login', null);
                                             <th>No</th>
                                             <th>ID Peminjaman</th>
                                             <th>Nama Peminjam</th>
-                                            <th>Tanggal Pinjam</th>
-                                            <th>Tanggal Kembali</th>
+                                            <th>Tanggal Peminjaman</th>
+                                            <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -99,32 +117,33 @@ $auth->AuthCheck('location:../login', null);
                                     <tbody class="text-dark text-center">
                                         <?php
                                         $no = 1;
-                                        if (count($admin->getDataPeminjaman(null)) > 0) {
-                                            foreach ($admin->getDataPeminjaman(null) as $data) {
+                                        if (count($admin->getDataPeminjaman($cari)) > 0) {
+                                            foreach ($admin->getDataPeminjaman($cari) as $data) {
                                         ?>
                                                 <tr>
                                                     <td><?= $no++ ?></td>
                                                     <td><?= $data[1] ?></td>
                                                     <td>
-                                                        <?= $data[2] ?>
+                                                        <?= strtoupper($data[2]) ?>
                                                     </td>
-                                                    <td><?= date('j', strtotime($data[5])) .' '.  namabulan(date('m', strtotime($data[5]))) .' '. date('Y', strtotime($data[5])) ?></td>
-                                                    <td><?= date('j', strtotime('+7 day', strtotime($data[5]))) .' '.  namabulan(date('m', strtotime('+7 day', strtotime($data[5])))) .' '. date('Y', strtotime('+7 day', strtotime($data[5]))) ?></td>
+                                                    <td>
+                                                        <?= date('d', strtotime($data[5])) . ' ' .  namabulan(date('m', strtotime($data[5]))) . ' ' . date('Y', strtotime($data[5])) ?>
+                                                    </td>
+                                                    <td>
+
+                                                        <?= $data[6] == null ? "-" : date('d', strtotime($data[6])) . ' ' .  namabulan(date('m', strtotime($data[6]))) . ' ' . date('Y', strtotime($data[6])) ?>
+                                                    </td>
                                                     <td>
                                                         <?php
                                                         if ($data[6] == null) {
-                                                        ?>
-                                                            Dipinjam
-                                                        <?php
+                                                            echo "Dipinjam";
                                                         } else {
-                                                        ?>
-                                                            Dikembalikan
-                                                        <?php
+                                                            echo "Dikembalikan";
                                                         }
                                                         ?>
                                                     </td>
                                                     <td>
-                                                        <a class="btn btn-sm btn-warning" href="viewbuku?id=<?= $data[1] ?>">View Peminjaman</a>
+                                                        <a class="btn btn-sm btn-warning" href="view-peminjaman?id=<?= $data[1] ?>">Lihat Peminjaman</a>
                                                     </td>
                                                 </tr>
                                             <?php

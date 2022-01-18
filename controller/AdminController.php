@@ -37,17 +37,44 @@ if (isset($_POST['btn_batal_peminjaman'])) {
 if (isset($_POST['btn_input_peminjaman'])) {
     $kodepeminjamanx = $_POST['kodepeminjaman'];
     $idbukux = $_POST['idbuku'];
-    $jumlahx = $_POST['jmlpinjam'];
-    $namax = $_POST['namapeminjam'];
-    $alamatx = $_POST['alamatpeminjam'];
-    $jumlahbukupinjaman = $admin->hitungPinjaman($kodepeminjamanx);
-    if ($jumlahbukupinjaman > 0) {
-        $admin->inputPinjamBuku($kodepeminjamanx, $idbukux, $jumlahx, null, null);
+    $databuku = $admin->cekDataBuku($idbukux);
+    if ($databuku == 0) {
+        # code...
     } else {
-        $admin->inputPinjamBuku($kodepeminjamanx, $idbukux, $jumlahx, $namax, $alamatx);
+        $jumlahx = $_POST['jmlpinjam'];
+        $namax = $_POST['namapeminjam'];
+        $alamatx = $_POST['alamatpeminjam'];
+        $jumlahbukupinjaman = $admin->hitungPinjaman($kodepeminjamanx);
+        if ($jumlahbukupinjaman > 0) {
+            $admin->inputPinjamBuku($kodepeminjamanx, $idbukux, $jumlahx, null, null);
+        } else {
+            $admin->inputPinjamBuku($kodepeminjamanx, $idbukux, $jumlahx, $namax, $alamatx);
+        }
     }
     sleep(2);
     header('location:../administrator/tambah-peminjaman?id_pinjam=' . $kodepeminjamanx);
+}
+
+if (isset($_POST['pengembalian'])) {
+    $id = $_POST['id_peminjaman'];
+    $jumlahbuku = $admin->hitungPinjaman($id);
+    $admin->pengembalianBuku($id);
+}
+
+if (isset($_POST['cetaklaporan'])) {
+    // echo 'cetaklaporan';
+    $jenis = $_POST['jenis'];
+    $bulan = $_POST['bulan'];
+    $tahun = $_POST['tahun'];
+    var_dump($_REQUEST);
+    if ($_REQUEST['jenis'] == 1) {
+        echo '<br> Peminjaman';
+    } elseif ($_REQUEST['jenis'] == 2) {
+        echo '<br> Pengembalian';
+    } elseif ($_REQUEST['jenis'] == 3) {
+        echo '<br> Buku';
+    }
+    // header('location:../administrator/laporan?jenis=' . $jenis . '&bulan=' . $bulan . '&tahun=' . $tahun);
 }
 
 class AdminController
@@ -60,7 +87,7 @@ class AdminController
         $qjumlahbuku = mysqli_query($koneksi, 'SELECT COUNT(*) AS jumlahbuku FROM buku');
         $jumlahbuku = mysqli_fetch_array($qjumlahbuku);
         //----------------------------------------------------------------------------------//
-        $qjumlahpeminjaman = mysqli_query($koneksi, 'SELECT COUNT(*) AS jumlahpeminjaman FROM peminjaman');
+        $qjumlahpeminjaman = mysqli_query($koneksi, 'SELECT COUNT(*) AS jumlahpeminjaman FROM peminjaman where tanggal_kembali != null');
         $jumlahpeminjaman = mysqli_fetch_array($qjumlahpeminjaman);
         //----------------------------------------------------------------------------------//
         $data = [
@@ -74,18 +101,14 @@ class AdminController
     public function getDataBuku($datasearch, $idbuku)
     {
         global $koneksi;
-        //----------------------------------------------------------------------------------//
-        if ($datasearch == '' || $datasearch == null || $idbuku == '' || $idbuku = null) {
-            $qdatabuku = mysqli_query($koneksi, 'SELECT * FROM buku order by penerbit');
-            $databuku = mysqli_fetch_all($qdatabuku);
+        if ($datasearch == null && $idbuku == null) {
+            $qdatabuku = mysqli_query($koneksi, 'SELECT * FROM buku order by nama_buku');
         } elseif ($datasearch != null) {
-            $qdatabuku = mysqli_query($koneksi, 'SELECT * FROM buku WHERE id_buku LIKE "%' . $datasearch . '%" OR penerbit LIKE "%' . $datasearch . '%" OR nama_buku LIKE "%' . $datasearch . '%"');
-            $databuku = mysqli_fetch_all($qdatabuku);
+            $qdatabuku = mysqli_query($koneksi, "SELECT * FROM buku WHERE id_buku LIKE '%$datasearch%' OR penerbit LIKE '%$datasearch%' OR nama_buku LIKE '%$datasearch%'");
         } elseif ($idbuku != null) {
-            $qdatabuku = mysqli_query($koneksi, 'SELECT * FROM buku WHERE id_buku = "' . $idbuku . '"');
-            $databuku = mysqli_fetch_all($qdatabuku);
+            $qdatabuku = mysqli_query($koneksi, "SELECT * FROM buku WHERE id_buku = '$idbuku'");
         }
-        //----------------------------------------------------------------------------------//
+        $databuku = mysqli_fetch_all($qdatabuku);
         return $databuku;
     }
     //----------------------------------------------------------------------------------//
@@ -114,8 +137,32 @@ class AdminController
         }
         mysqli_query($koneksi, $query);
     }
-
+    public function cekDataBuku($id)
+    {
+        # code...
+    }
     // Peminjaman
+    public function pengembalian($id)
+    {
+        global $koneksi;
+        $tgl = date('Y-m-d');
+        //----------------------------------------------------------------------------------//
+        $query = "UPDATE peminjaman SET tanggal_kembali='$tgl' WHERE id_peminjaman='$id'";
+        //----------------------------------------------------------------------------------//
+        mysqli_query($koneksi, $query);
+    }
+    public function pengembalianBuku($idpeminjaman)
+    {
+        global $koneksi;
+        $qdatapinjam = mysqli_query($koneksi, "SELECT id_buku, jumlah FROM list_peminjaman WHERE id_peminjaman='$idpeminjaman'");
+        $data = mysqli_fetch_all($qdatapinjam);
+        for ($i = 0; $i < count($data); $i++) {
+            echo $data[$i][0] . ' ' . $data[$i][1];
+            $this->nambahBuku($data[$i][0], $data[$i][1]);
+        }
+        $this->pengembalian($idpeminjaman);
+        header('location:../administrator/peminjaman');
+    }
     public function getDataPeminjaman($id)
     {
         global $koneksi;
@@ -124,7 +171,7 @@ class AdminController
             $qdatapeminjaman = mysqli_query($koneksi, "SELECT * FROM peminjaman");
             $datapeminjaman = mysqli_fetch_all($qdatapeminjaman);
         } else {
-            $qdatapeminjaman = mysqli_query($koneksi, "SELECT * FROM peminjaman WHERE id_peminjaman='$id'");
+            $qdatapeminjaman = mysqli_query($koneksi, "SELECT * FROM peminjaman WHERE id_peminjaman like '%$id%' or nama_peminjam like '%$id%'");
             $datapeminjaman = mysqli_fetch_all($qdatapeminjaman);
         }
         //----------------------------------------------------------------------------------//
@@ -210,5 +257,29 @@ class AdminController
             }
         } else {
         }
+    }
+    //----------------------------------------------------------------------------------//
+    public function getPeminjaman($id)
+    {
+        global $koneksi;
+        //----------------------------------------------------------------------------------//
+        $qdatapeminjaman = mysqli_query($koneksi, "SELECT
+            p.id_peminjaman,
+            p.nama_peminjam,
+            p.alamat_peminjam,
+            l.jumlah,
+            b.id_buku,
+            b.penerbit,
+            b.nama_buku,
+            p.tanggal_kembali
+        FROM
+            peminjaman AS p
+            JOIN list_peminjaman AS l ON l.id_peminjaman = p.id_peminjaman
+            JOIN buku AS b ON l.id_buku = b.id_buku 
+        WHERE
+            p.id_peminjaman = '$id'");
+        $datapeminjaman = mysqli_fetch_all($qdatapeminjaman);
+        //----------------------------------------------------------------------------------//
+        return $datapeminjaman;
     }
 }

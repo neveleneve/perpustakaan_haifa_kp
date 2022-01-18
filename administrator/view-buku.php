@@ -8,8 +8,7 @@ $auth = new AuthController();
 $admin = new AdminController();
 $auth->AuthCheck('location:../login', null);
 
-$databuku = $admin->getDataBuku(null, $_GET['id'])[0];
-
+$databuku = $admin->getDataBuku(null, $_GET['id']);
 ?>
 
 <!DOCTYPE html>
@@ -52,11 +51,11 @@ $databuku = $admin->getDataBuku(null, $_GET['id'])[0];
                                         <label for="kodebuku">Kode Buku</label>
                                         <input type="text" id="kodebuku" name="kodebuku" class="form-control form-control-sm mb-3" value="<?= $_GET['id'] ?>" readonly>
                                         <label for="namabuku">Nama Buku</label>
-                                        <input type="text" id="namabuku" name="namabuku" class="form-control form-control-sm mb-3" placeholder="<?= $databuku[3] ?>">
+                                        <input type="text" id="namabuku" name="namabuku" class="form-control form-control-sm mb-3" value="<?= $databuku[0][3] ?>">
                                         <label for="penerbitbuku">Penerbit Buku</label>
-                                        <input type="text" id="penerbitbuku" name="penerbitbuku" class="form-control form-control-sm mb-3" placeholder="<?= $databuku[2] ?>">
+                                        <input type="text" id="penerbitbuku" name="penerbitbuku" class="form-control form-control-sm mb-3" value="<?= $databuku[0][2] ?>">
                                         <label for="jumlahbuku">Jumlah Buku</label>
-                                        <input type="number" id="jumlahbuku" name="jumlahbuku" class="form-control form-control-sm mb-3" min="1" placeholder="<?= $databuku[4] ?>">
+                                        <input type="number" id="jumlahbuku" name="jumlahbuku" class="form-control form-control-sm mb-3" min="1" value="<?= $databuku[0][4] ?>">
                                         <button type="submit" class="btn btn-sm btn-primary btn-block" id="btn_ubah_buku" name="btn_ubah_buku">Ubah Data Buku</button>
                                     </form>
                                 </div>

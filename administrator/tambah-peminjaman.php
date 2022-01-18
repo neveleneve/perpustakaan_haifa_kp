@@ -7,7 +7,6 @@ require($_SERVER['DOCUMENT_ROOT'] . '/perpustakaan_haifa/controller/AdminControl
 $auth = new AuthController();
 $admin = new AdminController();
 $auth->AuthCheck('location:../login', null);
-
 $databuku = $admin->getDataBuku(null, null);
 if (isset($_GET['id_pinjam'])) {
     $idpeminjaman = $_GET['id_pinjam'];
@@ -53,21 +52,21 @@ if (isset($_GET['id_pinjam'])) {
                                 </div>
                                 <div class="card-body">
                                     <form action="../controller/AdminController.php" method="post">
-                                        <label for="kodepeminjaman">Kode Peminjaman</label>
+                                        <label for="kodepeminjaman" class="font-weight-bold">Kode Peminjaman</label>
                                         <input type="text" id="kodepeminjaman" name="kodepeminjaman" class="form-control form-control-sm mb-3" value="<?= $idpeminjaman ?>" readonly>
-                                        <label for="namapeminjam">Nama Peminjam</label>
+                                        <label for="namapeminjam" class="font-weight-bold">Nama Peminjam</label>
                                         <input type="text" value="<?= isset($_GET['id_pinjam']) ? $datapeminjam[0][2] : null ?>" id="namapeminjam" name="namapeminjam" class="form-control form-control-sm mb-3" placeholder="Nama Peminjam" required <?= isset($_GET['id_pinjam']) ? 'readonly' : null ?>>
-                                        <label for="alamatpeminjam">Alamat Peminjam</label>
+                                        <label for="alamatpeminjam" class="font-weight-bold">Alamat Peminjam</label>
                                         <textarea type="text" id="alamatpeminjam" name="alamatpeminjam" class="form-control form-control-sm mb-3" placeholder="Alamat Peminjam" required <?= isset($_GET['id_pinjam']) ? 'readonly' : null ?>><?= isset($_GET['id_pinjam']) ? $datapeminjam[0][3] : null ?></textarea>
-                                        <label for="daftarbuku">Daftar Buku</label>
+                                        <label for="daftarbuku" class="font-weight-bold">Daftar Buku</label>
                                         <div class="row">
                                             <div class="col-5">
-                                                <input list="idbuku" id="nomorbuku" name="idbuku" class="form-control form-control-sm mb-3" placeholder="Cari ID Buku" required>
+                                                <input onkeydown="return false" list="idbuku" id="nomorbuku" name="idbuku" class="form-control form-control-sm mb-3" placeholder="Cari ID Buku" required>
                                                 <datalist id="idbuku">
                                                     <?php
                                                     foreach ($databuku as $key) {
                                                     ?>
-                                                        <option value="<?= $key[1] ?>"><?= $key[3] ?></option>
+                                                        <option value="<?= $key[1] ?>"><?= $key[1] ?></option>
                                                     <?php
                                                     }
                                                     ?>

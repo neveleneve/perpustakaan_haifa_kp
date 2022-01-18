@@ -8,8 +8,9 @@ $auth = new AuthController();
 $admin = new AdminController();
 $auth->AuthCheck('location:../login', null);
 $databuku = null;
-if (isset($_GET['cari'])) {
-    $databuku = $admin->getDataBuku($_GET['cari'], null);
+if (isset($_POST['cari'])) {
+    $cari = $_POST['cari'];
+    $databuku = $admin->getDataBuku($cari, null);
 } else {
     $databuku = $admin->getDataBuku(null, null);
 }
@@ -39,12 +40,12 @@ if (isset($_GET['cari'])) {
                     </div>
                     <hr>
                     <?php
-                    if (isset($_GET['cari'])) {
+                    if (isset($_POST['cari'])) {
                     ?>
                         <div class="row">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-8 mb-3">
-                                <form action="" method="get">
-                                    <input id="cari" name="cari" class="form-control form-control-sm" type="text" placeholder="Cari Buku" value="<?= $_GET['cari'] ?>" required>
+                                <form action="" method="post">
+                                    <input id="cari" name="cari" class="form-control form-control-sm" type="text" placeholder="Cari Buku" value="<?= $_POST['cari'] ?>" required>
                                 </form>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-2 mb-3">
@@ -59,7 +60,7 @@ if (isset($_GET['cari'])) {
                     ?>
                         <div class="row">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-10 mb-3">
-                                <form action="" method="get">
+                                <form action="" method="post">
                                     <input id="cari" name="cari" class="form-control form-control-sm" type="text" placeholder="Cari Buku" required>
                                 </form>
                             </div>
@@ -72,7 +73,7 @@ if (isset($_GET['cari'])) {
                     ?>
                     <div class="row">
                         <div class="col-12">
-                            <div class="table-responsive border">
+                            <div class="table-responsive">
                                 <table class="table table-sm table-hover table-bordered">
                                     <thead class="text-light text-center bg-dark">
                                         <tr>
@@ -80,7 +81,7 @@ if (isset($_GET['cari'])) {
                                             <th>ID Buku</th>
                                             <th>Penerbit</th>
                                             <th>Judul Buku</th>
-                                            <th>Jumlah</th>
+                                            <th>Tersedia</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>

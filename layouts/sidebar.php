@@ -9,13 +9,13 @@
             <span>Dashboard</span>
         </a>
     </li>
-    <li class="nav-item <?php echo $current_page == 'buku.php' || $current_page == 'viewbuku.php'  ? 'active' : NULL ?>">
+    <li class="nav-item <?php echo $current_page == 'buku.php' || $current_page == 'view-buku.php'  ? 'active' : NULL ?>">
         <a class="nav-link" href="buku">
             <i class="fas fa-fw fa-book"></i>
             <span>Buku</span>
         </a>
     </li>
-    <li class="nav-item <?php echo $current_page == 'peminjaman.php' || $current_page == 'tambah-peminjaman.php' ? 'active' : NULL ?>">
+    <li class="nav-item <?php echo $current_page == 'peminjaman.php' || $current_page == 'tambah-peminjaman.php' || $current_page == 'view-peminjaman.php' ? 'active' : NULL ?>">
         <a class="nav-link" href="peminjaman">
             <i class="fas fa-fw fa-upload"></i>
             <span>Peminjaman</span>
